@@ -38,5 +38,8 @@
     <PackageReference Include="Uno.Wasm.Bootstrap" Version="8.0.20" />
     <PackageReference Include="Uno.Wasm.Bootstrap.DevServer" Version="8.0.20" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Backlogs\Backlogs.csproj" />
+  </ItemGroup>
   <Import Project="..\Backlogs.Shared\Backlogs.Shared.projitems" Label="Shared" />
 </Project>

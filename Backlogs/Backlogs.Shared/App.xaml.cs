@@ -1,5 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Backlogs.Constants;
+using Backlogs.Services;
+using Backlogs.Utils;
+using Backlogs.Utils.Uno;
+using Backlogs.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
@@ -14,6 +21,10 @@ namespace Backlogs
     /// </summary>
     public sealed partial class App : Application
     {
+        private IServiceProvider m_serviceProvider;
+        private IUserSettings m_userSettings;
+        private INavigation m_navigationService;
+        private IFileHandler m_fileHander;
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -23,10 +34,24 @@ namespace Backlogs
             InitializeLogging();
 
             this.InitializeComponent();
+            m_serviceProvider = ConfigureServices();
 
 #if HAS_UNO || NETFX_CORE
-			this.Suspending += OnSuspending;
+            this.Suspending += OnSuspending;
 #endif
+        }
+
+        public static IServiceProvider Services
+        {
+            get
+            {
+                IServiceProvider serviceProvider = ((App)Current).m_serviceProvider;
+                if (serviceProvider == null)
+                {
+                    throw new InvalidOperationException("Service is not initialized");
+                }
+                return serviceProvider;
+            }
         }
 
         /// <summary>
@@ -73,6 +98,21 @@ namespace Backlogs
 
                 // Place the frame in the current Window
                 MainWindow.Content = rootFrame;
+
+                m_serviceProvider = ConfigureServices();
+                m_userSettings = Services.GetRequiredService<IUserSettings>();
+                //m_userSettings.UserSettingsChanged += M_userSettings_UserSettingsChanged;
+                //rootFrame.ActualThemeChanged += RootFrame_ActualThemeChanged;
+                m_fileHander = Services.GetRequiredService<IFileHandler>();
+                m_navigationService = Services.GetRequiredService<INavigation>();
+                m_navigationService.RegisterViewForViewModel(typeof(MainViewModel), typeof(MainPage));
+                m_navigationService.RegisterViewForViewModel(typeof(BacklogsViewModel), typeof(BacklogsPage));
+                m_navigationService.RegisterViewForViewModel(typeof(BacklogViewModel), typeof(BacklogPage));
+                m_navigationService.RegisterViewForViewModel(typeof(CompletedBacklogsViewModel), typeof(CompletedBacklogsPage));
+                m_navigationService.RegisterViewForViewModel(typeof(CompletedBacklogViewModel), typeof(CompletedBacklogPage));
+                m_navigationService.RegisterViewForViewModel(typeof(CreateBacklogViewModel), typeof(CreatePage));
+                m_navigationService.RegisterViewForViewModel(typeof(ImportBacklogViewModel), typeof(ImportBacklog));
+                m_navigationService.RegisterViewForViewModel(typeof(SettingsViewModel), typeof(SettingsPage));
             }
 
 #if !(NET6_0_OR_GREATER && WINDOWS)
@@ -84,11 +124,40 @@ namespace Backlogs
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(MainPage), args.Arguments);
+                    var version = Package.Current.Id.Version;
+                    string currVer = string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
+                    var settingsService = Services.GetRequiredService<IUserSettings>();
+                    var settingsVersion = settingsService.Get<string>(SettingsConstants.Version);
+                    if (settingsVersion == null || settingsVersion != currVer)
+                    {
+                        settingsService.Set(SettingsConstants.ShowWhatsNew, true);
+                    }
+                    settingsService.Set(SettingsConstants.Version, currVer);
+                    BacklogsManager.GetInstance().InitBacklogsManager(m_fileHander);
+                    Task.Run(async () => { await BacklogsManager.GetInstance().ReadDataAsync(); }).Wait();
+                    BacklogsManager.GetInstance().ResetHelperBacklogs();
+                    rootFrame.Navigate(typeof(MainPage), "sync");
                 }
                 // Ensure the current window is active
                 MainWindow.Activate();
             }
+        }
+
+        private static IServiceProvider ConfigureServices()
+        {
+            var provider = new ServiceCollection()
+                .AddSingleton<IUserSettings, Settings>()
+                .AddSingleton<IMsal, MSAL>()
+                .AddSingleton<IDialogHandler, DialogHandler>()
+                .AddSingleton<IEmailService, EmailHandler>()
+                .AddSingleton<IFileHandler, Backlogs.Utils.UWP.FileIO>()
+                .AddSingleton<IFilePicker, FilePickerService>()
+                .AddSingleton<IShareDialogService, ShareDialogService>()
+                .AddSingleton<IToastNotificationService, ToastNotificationService>()
+                .AddSingleton<INavigation, Navigator>()
+                .AddSingleton<ISystemLauncher, SystemLauncher>()
+                .BuildServiceProvider();
+            return provider;
         }
 
         /// <summary>

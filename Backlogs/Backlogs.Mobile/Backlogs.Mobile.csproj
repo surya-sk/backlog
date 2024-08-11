@@ -22,12 +22,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Uno.Toolkit.UI" Version="6.1.8" />
     <PackageReference Include="Uno.UI" Version="5.3.90" />
     <!-- Keep this reference as RemoteControl for backward compatibility -->
     <PackageReference Include="Uno.UI.RemoteControl" Version="5.3.90" Condition="'$(Configuration)'=='Debug'" />
     <PackageReference Include="Uno.UI.DevServer" Version="5.3.90" Condition="'$(Configuration)'=='Debug'" />
     <PackageReference Include="Uno.UI.Adapter.Microsoft.Extensions.Logging" Version="5.3.90" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Backlogs\Backlogs.csproj" />
   </ItemGroup>
   <Choose>
     <When Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
