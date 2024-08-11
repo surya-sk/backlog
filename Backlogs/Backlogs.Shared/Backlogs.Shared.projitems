@@ -27,6 +27,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Utils\FileIO.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\FilePickerService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\MSAL.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\Navigator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\Settings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\ShareDialogService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)MainPage.xaml">
