@@ -22,6 +22,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Uno.Microsoft.Toolkit" Version="7.1.11" />
+    <PackageReference Include="Uno.Toolkit" Version="6.1.8" />
     <PackageReference Include="Uno.Toolkit.UI" Version="6.1.8" />
     <PackageReference Include="Uno.UI" Version="5.3.90" />
     <!-- Keep this reference as RemoteControl for backward compatibility -->
