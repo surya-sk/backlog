@@ -22,6 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.63.0" />
     <PackageReference Include="Uno.Microsoft.Toolkit" Version="7.1.11" />
     <PackageReference Include="Uno.Toolkit" Version="6.1.8" />
     <PackageReference Include="Uno.Toolkit.UI" Version="6.1.8" />
@@ -31,6 +32,7 @@
     <PackageReference Include="Uno.UI.DevServer" Version="5.3.90" Condition="'$(Configuration)'=='Debug'" />
     <PackageReference Include="Uno.UI.Adapter.Microsoft.Extensions.Logging" Version="5.3.90" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    <PackageReference Include="Uno.WinUI.MSAL" Version="5.3.114" />
   </ItemGroup>
 
   <ItemGroup>

@@ -14,5 +14,7 @@
     <_Globbed_Compile Remove="Utils\DialogHandler.cs" />
     <_Globbed_Compile Remove="Utils\EmailHandler.cs" />
     <_Globbed_Compile Remove="Utils\FileIO.cs" />
+    <_Globbed_Compile Remove="Utils\FilePickerService.cs" />
+    <_Globbed_Compile Remove="Utils\MSAL.cs" />
   </ItemGroup>
 </Project>
